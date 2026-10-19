@@ -1,0 +1,2 @@
+# Run the Python app file that serves the site and handles its API.
+python .\app.py

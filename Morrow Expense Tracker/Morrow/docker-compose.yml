@@ -1,0 +1,29 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      SECRET_KEY: ${SECRET_KEY:-local-compose-only-change-this-secret}
+      DATABASE_URL: mysql+pymysql://morrow:morrow-local-only@db:3306/expense_tracker?charset=utf8mb4
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: expense_tracker
+      MYSQL_USER: morrow
+      MYSQL_PASSWORD: morrow-local-only
+      MYSQL_ROOT_PASSWORD: local-root-only
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plocal-root-only"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  mysql-data:
